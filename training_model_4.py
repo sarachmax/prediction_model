@@ -160,8 +160,7 @@ for i in range(1, predict_period):
         direction.append([0])
 accuracy = accuracy/predict_period * 100
 print('accuracy :', accuracy ,'%')
-
-
+"""
 
 
 
