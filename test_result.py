@@ -1,5 +1,5 @@
 # change test_day (must >= 1)  
-test_day = 520 
+test_day = 200
 #########################################################################################
 
 
@@ -44,7 +44,7 @@ start_index = 7084
 end_index = 11245 + 1
 dataset = dataset_import.iloc[start_index:end_index,:]
 training_set = dataset.iloc[:, 2:6].values
-look_back_day = 60
+look_back_day = 22
 sc = MinMaxScaler(feature_range = (0,1))
 training_set = sc.fit_transform(training_set)
 
@@ -62,7 +62,7 @@ loaded_model = model_from_json(loaded_model_json)
 loaded_model.load_weights('model.h5')
 print('loaded model')
 #eveluate loaded model on test data 
-loaded_model.compile(optimizer = 'RMSprop', loss = 'mean_squared_error')
+loaded_model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 #########################################################################################
 # Prediction Result 
@@ -80,11 +80,12 @@ for i in range(look_back_day, test_result_day):
     X_test.append(inputs[i-look_back_day:i, :])
 X_test = np.array(X_test)
 
-predicted_close_price = loaded_model.predict(X_test)
-predicted_close_price = scaler.inverse_transform(predicted_close_price)
-
 real_close_price = dataset_import.iloc[end_index:end_input_index, 5:6].values
 copy_close_price = real_close_price
+
+predicted_close_price = loaded_model.predict(X_test)
+predicted_close_price = sc.inverse_transform(predicted_close_price)
+predicted_close_price = predicted_close_price[:, 0]
 #########################################################################################
 # Accuracy check 
 #########################################################################################

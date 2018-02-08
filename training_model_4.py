@@ -43,7 +43,7 @@ y_train = []
 look_back_day = 22
 for i in range(look_back_day , 4161):
     X_train.append(training_set[i-look_back_day:i, :])
-    y_train.append(training_set[i, 0])
+    y_train.append(training_set[i, :])
 X_train , y_train = np.array(X_train) , np.array(y_train)
 
 #########################################################################################
@@ -59,22 +59,24 @@ from keras.layers import Dropout
 regressor = Sequential()
 
 # Adding the first LSTM layer and some Dropout regularisation
-regressor.add(LSTM(units = 128, return_sequences = True, input_shape =(X_train.shape[1],X_train.shape[2])))
+regressor.add(LSTM(units = 256, return_sequences = True, input_shape =(X_train.shape[1],X_train.shape[2])))
 regressor.add(Dropout(0.2)) # Dropout 20% of layers recommended   
- 
-# Adding the fourth LSTM layer and some Dropout regularisation
+
+regressor.add(LSTM(units = 128, return_sequences = True))
+regressor.add(Dropout(0.2)) 
+
 regressor.add(LSTM(units = 64))
 regressor.add(Dropout(0.2))
 
 # Adding the output layer 
 regressor.add(Dense(units = 16, init = 'uniform', activation='relu'))
-regressor.add(Dense(units = 1, init='uniform', activation='linear')) 
+regressor.add(Dense(units = 4, init='uniform', activation='linear')) 
 
 # Compiling the RNN 
-regressor.compile(optimizer = 'RMSprop', loss = 'mean_squared_error')
+regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 # Fitting the RNN to the Training set 
-regressor.fit(X_train, y_train, epochs = 500, batch_size = 32)
+regressor.fit(X_train, y_train, epochs = 50, batch_size = 32)
 
 #########################################################################################
 # save/load prediction model  
@@ -86,7 +88,7 @@ with open('model.json', 'w') as json_file:
     json_file.write(model_json)
 regressor.save_weights('model.h5')
 print('saved model')
-print('traning done')
+print('training done')
 
 """
 # load model from json file 
