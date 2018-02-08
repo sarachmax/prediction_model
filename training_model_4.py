@@ -86,7 +86,9 @@ with open('model.json', 'w') as json_file:
     json_file.write(model_json)
 regressor.save_weights('model.h5')
 print('saved model')
+print('traning done')
 
+"""
 # load model from json file 
 from keras.models import model_from_json
 json_file = open('model.json', 'r')
