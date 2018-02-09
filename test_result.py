@@ -1,40 +1,14 @@
 # change test_day (must >= 1)  
-test_day = 200
+test_day = 500
 #########################################################################################
-
 
 import numpy as np
 import matplotlib.pyplot as plt 
 import pandas as pd 
 from sklearn.preprocessing import MinMaxScaler
-#########################################################################################
-# Create indicator 
-#########################################################################################
-def RSI_calculate(start, end):
-    indicator_RSI = []
-    period = 14
-    temp_close = dataset_import.iloc[:,5:6].values
-    for i in range(start, end):
-        chg = 0 
-        lost = 0 
-        gain = 0 
-        avg_lost = 0
-        avg_gain = 0 
-        for k in range(period):
-            chg = temp_close[i+k,0]-temp_close[i+k-1,0]
-            if chg < 0 :
-                lost += abs(chg)
-            elif chg > 0 : 
-                gain += chg 
-        avg_lost = lost/period 
-        avg_gain = gain/period 
-        RSI = (100-100/(1+avg_gain/avg_lost))/100   #scaled RSI values during 0-1
-        indicator_RSI.append([RSI])
-    indicator_RSI = np.array(indicator_RSI)
-    return indicator_RSI 
 
 #########################################################################################
-# Training Data (Use as Reference)
+# Data 
 #########################################################################################
 
 dataset_import = pd.read_csv('EURUSD.csv')
@@ -43,11 +17,25 @@ dataset_import = pd.read_csv('EURUSD.csv')
 start_index = 7084
 end_index = 11245 + 1
 dataset = dataset_import.iloc[start_index:end_index,:]
-training_set = dataset.iloc[:, 2:6].values
 look_back_day = 22
 sc = MinMaxScaler(feature_range = (0,1))
-training_set = sc.fit_transform(training_set)
 
+# init input index for test_set 
+test_result_day = look_back_day + test_day     
+start_input_index = end_index - look_back_day 
+end_input_index = start_input_index + test_result_day
+
+inputs = dataset_import.iloc[start_input_index:end_input_index, 5:6].values
+real_close_price = dataset_import.iloc[end_index:end_input_index , 5:6].values
+#real_close_price = sc.fit_transform(real_close_price)
+inputs = sc.fit_transform(inputs)
+
+input_close_price = []
+X_test = []
+for i in range(look_back_day, test_result_day): 
+    X_test.append(inputs[i-look_back_day:i, :])
+    input_close_price.append(inputs[i,:])
+X_test , input_close_price = np.array(X_test), np.array(input_close_price)
 
 #########################################################################################
 # load prediction model  
@@ -67,25 +55,13 @@ loaded_model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 #########################################################################################
 # Prediction Result 
 #########################################################################################
-# init input index for test_set 
-test_result_day = look_back_day + test_day     
-start_input_index = end_index - look_back_day 
-end_input_index = start_input_index + test_result_day
-
-inputs = dataset_import.iloc[start_input_index:end_input_index, 2:6].values
-inputs = sc.fit_transform(inputs)
-
-X_test = []
-for i in range(look_back_day, test_result_day): 
-    X_test.append(inputs[i-look_back_day:i, :])
-X_test = np.array(X_test)
-
-real_close_price = dataset_import.iloc[end_index:end_input_index, 5:6].values
-copy_close_price = real_close_price
 
 predicted_close_price = loaded_model.predict(X_test)
+#predicted_close_price = sc.inverse_transform(predicted_close_price)
+for i in range(predicted_close_price.shape[0]):
+    predicted_close_price[i,0] += input_close_price[i,0]
 predicted_close_price = sc.inverse_transform(predicted_close_price)
-predicted_close_price = predicted_close_price[:, 0]
+
 #########################################################################################
 # Accuracy check 
 #########################################################################################
