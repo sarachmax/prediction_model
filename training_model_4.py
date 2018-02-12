@@ -82,7 +82,7 @@ regressor.add(Dense(units = 1, init='uniform', activation='linear'))
 
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
-regressor.fit(X_train, y_train, epochs = 50)
+regressor.fit(X_train, y_train, epochs = 500)
 
 #########################################################################################
 # save prediction model  
