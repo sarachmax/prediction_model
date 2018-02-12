@@ -57,9 +57,6 @@ loaded_model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 #########################################################################################
 
 predicted_close_price = loaded_model.predict(X_test)
-#predicted_close_price = sc.inverse_transform(predicted_close_price)
-for i in range(predicted_close_price.shape[0]):
-    predicted_close_price[i,0] += input_close_price[i,0]
 predicted_close_price = sc.inverse_transform(predicted_close_price)
 
 #########################################################################################
@@ -87,6 +84,8 @@ print('accuracy :', accuracy ,'%')
 #########################################################################################
 # Visualization
 #########################################################################################
+# real_close_price = sc.fit_transform(real_close_price)
+# predicted_close_price = sc.fit_transform(predicted_close_price)
 print('----------------------------------------------------------------------------------')
 print('---------------------------- Predict in :', test_day , 'days ------------------------------')
 print('----------------------------------------------------------------------------------')

@@ -14,7 +14,7 @@ Created on Sun Feb  4 19:42:22 2018
 
 
 import numpy as np
-import matplotlib.pyplot as plt 
+#import matplotlib.pyplot as plt 
 import pandas as pd 
 
 #########################################################################################
@@ -40,14 +40,14 @@ training_set = np.array(training_set)
 
 X_train = []
 y_train = [] 
-look_back_day = 22
+look_back_day = 64
 for i in range(look_back_day , 4161):
     X_train.append(training_set[i-look_back_day:i, :])
-    y_train.append(training_set[i,0]-training_set[i-1,0])
-X_train , y_train = np.array(X_train) , np.array(y_train)
+    y_train.append(training_set[i, :])
+X_train, y_train,  = np.array(X_train), np.array(y_train)
 
 #########################################################################################
-# RNN 
+# RNN predict price 
 #########################################################################################
 
 from keras.models import Sequential
@@ -57,28 +57,40 @@ from keras.layers import Dropout
 
 regressor = Sequential()
 
-regressor.add(LSTM(units = 128, return_sequences = True, input_shape =(X_train.shape[1],X_train.shape[2])))
+regressor.add(LSTM(units = 1024, return_sequences = True, input_shape =(X_train.shape[1],X_train.shape[2])))
 regressor.add(Dropout(0.2))  
+
+regressor.add(LSTM(units = 512, return_sequences = True))
+regressor.add(Dropout(0.2)) 
+
+regressor.add(LSTM(units = 256, return_sequences = True))
+regressor.add(Dropout(0.2)) 
+
+regressor.add(LSTM(units = 128, return_sequences = True))
+regressor.add(Dropout(0.2)) 
 
 regressor.add(LSTM(units = 64, return_sequences = True))
 regressor.add(Dropout(0.2)) 
 
-regressor.add(LSTM(units = 32))
+regressor.add(LSTM(units = 32, return_sequences = True))
+regressor.add(Dropout(0.2)) 
+
+regressor.add(LSTM(units = 16))
 regressor.add(Dropout(0.2))
 
 regressor.add(Dense(units = 1, init='uniform', activation='linear')) 
 
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
-regressor.fit(X_train, y_train, epochs = 50, batch_size = 32)
+regressor.fit(X_train, y_train, epochs = 50)
 
 #########################################################################################
 # save prediction model  
 #########################################################################################
 # save model to json file
 model_json = regressor.to_json()
-with open('model.json', 'w') as json_file:
+with open('model_price.json', 'w') as json_file:
     json_file.write(model_json)
-regressor.save_weights('model.h5')
+regressor.save_weights('model_price.h5')
 print('saved model')
-print('training done')
+print('training predict price done')
