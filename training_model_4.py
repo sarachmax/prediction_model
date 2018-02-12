@@ -57,25 +57,25 @@ from keras.layers import Dropout
 
 regressor = Sequential()
 
-regressor.add(LSTM(units = 1024, return_sequences = True, input_shape =(X_train.shape[1],X_train.shape[2])))
+regressor.add(LSTM(units = 200, return_sequences = True, input_shape =(X_train.shape[1],X_train.shape[2])))
 regressor.add(Dropout(0.2))  
 
-regressor.add(LSTM(units = 512, return_sequences = True))
+regressor.add(LSTM(units = 100, return_sequences = True))
 regressor.add(Dropout(0.2)) 
 
-regressor.add(LSTM(units = 256, return_sequences = True))
+regressor.add(LSTM(units = 100, return_sequences = True))
 regressor.add(Dropout(0.2)) 
 
-regressor.add(LSTM(units = 128, return_sequences = True))
+regressor.add(LSTM(units = 100, return_sequences = True))
 regressor.add(Dropout(0.2)) 
 
-regressor.add(LSTM(units = 64, return_sequences = True))
+regressor.add(LSTM(units = 100, return_sequences = True))
 regressor.add(Dropout(0.2)) 
 
-regressor.add(LSTM(units = 32, return_sequences = True))
+regressor.add(LSTM(units = 100, return_sequences = True))
 regressor.add(Dropout(0.2)) 
 
-regressor.add(LSTM(units = 16))
+regressor.add(LSTM(units = 200))
 regressor.add(Dropout(0.2))
 
 regressor.add(Dense(units = 1, init='uniform', activation='linear')) 
