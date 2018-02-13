@@ -17,7 +17,7 @@ dataset_import = pd.read_csv('EURUSD.csv')
 start_index = 7084
 end_index = 11245 + 1
 dataset = dataset_import.iloc[start_index:end_index,:]
-look_back_day = 22
+look_back_day = 64
 sc = MinMaxScaler(feature_range = (0,1))
 
 # init input index for test_set 
@@ -43,11 +43,11 @@ X_test , input_close_price = np.array(X_test), np.array(input_close_price)
 
 # load model from json file 
 from keras.models import model_from_json
-json_file = open('model.json', 'r')
+json_file = open('model_price.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
-loaded_model.load_weights('model.h5')
+loaded_model.load_weights('model_price.h5')
 print('loaded model')
 #eveluate loaded model on test data 
 loaded_model.compile(optimizer = 'adam', loss = 'mean_squared_error')
